@@ -6,12 +6,16 @@ public enum Suits {
 
 	private int suit;
 
-	Suits(int suit) {
+	private Suits(int suit) {
 		this.suit = suit;
 	}
 
 	public int getSuit() {
 		return suit;
+	}
+	
+	public String toString() {
+		return ""+suit;
 	}
 
 	public static boolean contains(Suits suit) {
