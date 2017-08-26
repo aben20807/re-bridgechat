@@ -17,9 +17,5 @@ public class CardTest {
 		} catch (CardException e) {
 			System.out.println(e.getErrorMsg());
 		}
-		
-		
-
 	}
-
 }
