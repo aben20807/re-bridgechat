@@ -40,11 +40,11 @@ public class Server {
 		}
 		while(Server.this.clientList.size() < 4) {
 			try (Socket socket = serverSocket.accept();){
-//				socket = serverSocket.accept();
 				Server.this.clientList.add(new ObjectOutputStream(socket.getOutputStream()));
 			} catch (IOException e) {
 				throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 			}
+			System.out.println("Server: room client = " + Server.this.clientList.size());
 		}
 	}
 	
@@ -56,33 +56,6 @@ public class Server {
 			return "";
 		}
 	}
-	
-//	class ClientCollection implements Runnable{
-//		
-//		private ServerSocket serverSocket = null;
-//		
-//		public ClientCollection() throws ServerException{
-//
-//			try {
-//				serverSocket = new ServerSocket(8080);
-//			} catch (IOException e) {
-//				throw new ServerException(ErrorCode.SERVERSOCKET_CREATE_ERROR);
-//			}
-//			new Thread(this).start();
-//		}
-//		
-//		public void run() {
-//			
-//			while(Server.this.clientList.size() < 4) {
-//				try (Socket socket= serverSocket.accept();){
-////					socket = serverSocket.accept();
-//					Server.this.clientList.add(new ObjectOutputStream(socket.getOutputStream()));
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//	}
 }
 
 class Channel implements Runnable{

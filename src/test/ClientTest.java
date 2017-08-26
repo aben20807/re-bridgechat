@@ -8,5 +8,4 @@ public class ClientTest {
 
 		new Client();
 	}
-
 }
