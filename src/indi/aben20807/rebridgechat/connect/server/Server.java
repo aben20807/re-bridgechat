@@ -32,6 +32,8 @@ public class Server {
 			e2.printErrorMsg();
 		}
 		System.out.println("Server: room full....");
+		createChannel();
+		System.out.println("Server: channels have been created....");
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
 			out.writeObject("S");
@@ -68,10 +70,35 @@ public class Server {
 		}
 	}
 	
+	public void createChannel() {
+		
+		for(Socket socket : clientList) {
+			new Channel(socket);
+		}
+	}
+	
 	class Channel implements Runnable{
+		
+		private Socket socket;
+		
+		Channel(Socket socket){
+			
+			this.socket = socket;
+			new Thread(this).start();
+		}
 	
 		public void run() {
+			
+			Object object;
+			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
+				while ((object = in.readObject()) != null) {
+					System.out.println(object);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
-
