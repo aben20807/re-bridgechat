@@ -1,6 +1,7 @@
 package indi.aben20807.rebridgechat.connect.server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -13,7 +14,7 @@ import indi.aben20807.rebridgechat.exception.ServerException;
 
 public class Server {
 
-	private CopyOnWriteArrayList<ObjectOutputStream> clientList;
+	private CopyOnWriteArrayList<Socket> clientList;
 	
 	public Server() {
 
@@ -31,14 +32,23 @@ public class Server {
 			e2.printErrorMsg();
 		}
 		System.out.println("Server: room full....");
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
+			out.writeObject("S");
+			out = new ObjectOutputStream(clientList.get(1).getOutputStream());
+			out.writeObject("SS");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void collectClient() throws ServerException {
 		
 		try (ServerSocket serverSocket = new ServerSocket(8080);){
 			while(Server.this.clientList.size() < 4) {
-				try (Socket socket = serverSocket.accept();){
-					Server.this.clientList.add(new ObjectOutputStream(socket.getOutputStream()));
+				try {
+					Socket socket = serverSocket.accept();
+					Server.this.clientList.add(socket);
 				} catch (IOException e) {
 					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 				}
@@ -50,17 +60,18 @@ public class Server {
 	}
 	
 	public String getServerIP() throws ServerException {
+		
 		try {
 			return InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException e) {
 			throw new ServerException(ErrorCode.GET_SERVER_IP_ERROR);
 		}
 	}
-}
-
-class Channel implements Runnable{
 	
-	public void run() {
-		
+	class Channel implements Runnable{
+	
+		public void run() {
+		}
 	}
 }
+
