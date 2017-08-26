@@ -33,13 +33,13 @@ public class Server {
 			e2.printErrorMsg();
 		}
 		System.out.println("Server: room full....");
-		createChannel();
+		linkBroadcasterToReceivers();
 		System.out.println("Server: channels have been created....");
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
-			out.writeObject("S");
+			out.writeObject(new Message("S"));
 			out = new ObjectOutputStream(clientList.get(1).getOutputStream());
-			out.writeObject("SS");
+			out.writeObject(new Message("SS"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -54,7 +54,7 @@ public class Server {
 				} catch (IOException e) {
 					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 				}
-				System.out.println("Server: room client = " + Server.this.clientList.size());
+				System.out.println("Server: room size = " + clientList.size());
 			}
 		} catch (IOException e) {
 			throw new ServerException(ErrorCode.SERVERSOCKET_CREATE_ERROR);
@@ -69,37 +69,44 @@ public class Server {
 		}
 	}
 	
-	public void createChannel() {
+	public void linkBroadcasterToReceivers() {
 		for(Socket socket : clientList) {
-			new Channel(socket);
+			new Broadcaster(socket);
 		}
 	}
 	
-	class Channel implements Runnable{
+	class Broadcaster implements Runnable{
 		
 		private Socket socket;
 		
-		Channel(Socket socket){
+		Broadcaster(Socket socket){
 			this.socket = socket;
 			new Thread(this).start();
 		}
 	
 		public void run() {
-			String message;
+			Message message;
 			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
-				while ((message = (String) in.readObject()) != null) {
+				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
+//					broadcast(message, Server.this.clientList);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
+			}// catch (ServerException e) {
+//				e.printErrorMsg();
+//			}
 		}
 		
-		public void broadcast(Message message, List<ObjectOutputStream> memberList) {
-			for (ObjectOutputStream i : memberList) {
-				straightTransmit(message, i);
+		public void broadcast(Message message, List<Socket> memberList) throws ServerException {
+			for (Socket i : memberList) {
+				try {
+					straightTransmit(message, new ObjectOutputStream(i.getOutputStream()));
+				} catch (IOException e) {
+					throw new ServerException(ErrorCode.SERVER_BROADCAST_ERROR);
+				}
 			}
 		}
 		

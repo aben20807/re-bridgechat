@@ -6,7 +6,8 @@ public enum ErrorCode {
 	SERVERSOCKET_CREATE_ERROR(1, "Cannot new ServerSocket with port."),
 	SOCKET_ACCEPT_ERROR(2, "Socket accept error that cannot full room."),
 	GET_SERVER_IP_ERROR(3, "Cannot get server's IP address."),
-	CLIENT_SUBMIT_ERROR(4, "Error when subming message.");
+	CLIENT_SUBMIT_ERROR(4, "Error when subming message."),
+	SERVER_BROADCAST_ERROR(5, "Error when broadcasting to member.");
 	
 	private final int code;
 	private final String msg;

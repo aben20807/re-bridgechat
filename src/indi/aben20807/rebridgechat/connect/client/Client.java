@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import indi.aben20807.rebridgechat.ErrorCode;
+import indi.aben20807.rebridgechat.connect.Message;
 import indi.aben20807.rebridgechat.exception.ClientException;
 
 public class Client {
@@ -25,7 +26,7 @@ public class Client {
 		}
 	}
 	
-	public void submit(String message) throws ClientException {
+	public void submit(Message message) throws ClientException {
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			out.writeObject(message);
@@ -42,10 +43,10 @@ public class Client {
 		}
 		
 		public void run() {
-			Object object;
+			Message message;
 			try (ObjectInputStream in = new ObjectInputStream(Client.this.socket.getInputStream());){
-				while ((object = in.readObject()) != null) {
-					System.out.println(object);
+				while ((message = (Message) in.readObject()) != null) {
+					System.out.println(message);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
