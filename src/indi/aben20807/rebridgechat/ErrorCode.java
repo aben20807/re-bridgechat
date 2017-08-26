@@ -3,7 +3,8 @@ package indi.aben20807.rebridgechat;
 public enum ErrorCode {
 
 	CARD_ARGUMENT_ERROR(0, "Argument error occurred when creating a card."),
-	SERVERSOCKET_CREATE_ERROR(1, "Cannot new ServerSocket with port in Server.java");
+	SERVERSOCKET_CREATE_ERROR(1, "Cannot new ServerSocket with port."),
+	SOCKET_ACCEPT_ERROR(2, "Socket accept error that cannot full room.");
 	
 	private final int code;
 	private final String msg;
