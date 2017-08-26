@@ -7,8 +7,8 @@ import java.net.Socket;
 public class Client {
 
 	private Socket socket;
+	
 	public Client() {
-
 		connectToServer("192.168.56.1");
 		new Channel();
 	}
@@ -24,12 +24,10 @@ public class Client {
 	class Channel implements Runnable{
 		
 		Channel(){
-			
 			new Thread(this).start();
 		}
 		
 		public void run() {
-			
 			Object object;
 			try (ObjectInputStream in = new ObjectInputStream(Client.this.socket.getInputStream());){
 				while ((object = in.readObject()) != null) {

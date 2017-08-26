@@ -17,7 +17,6 @@ public class Server {
 	private CopyOnWriteArrayList<Socket> clientList;
 	
 	public Server() {
-
 		System.out.println("Server: start....");
 		try {
 			System.out.println("Server: IP = " + getServerIP());
@@ -45,7 +44,6 @@ public class Server {
 	}
 	
 	private void collectClient() throws ServerException {
-		
 		try (ServerSocket serverSocket = new ServerSocket(8080);){
 			while(Server.this.clientList.size() < 4) {
 				try {
@@ -62,7 +60,6 @@ public class Server {
 	}
 	
 	public String getServerIP() throws ServerException {
-		
 		try {
 			return InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException e) {
@@ -71,7 +68,6 @@ public class Server {
 	}
 	
 	public void createChannel() {
-		
 		for(Socket socket : clientList) {
 			new Channel(socket);
 		}
@@ -82,13 +78,11 @@ public class Server {
 		private Socket socket;
 		
 		Channel(Socket socket){
-			
 			this.socket = socket;
 			new Thread(this).start();
 		}
 	
 		public void run() {
-			
 			Object object;
 			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
 				while ((object = in.readObject()) != null) {
