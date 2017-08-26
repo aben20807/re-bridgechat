@@ -18,42 +18,42 @@ public class Server {
 	public Server() {
 
 		System.out.println("Server: start....");
-		System.out.println("Server: IP = " + getServerIP());
+		try {
+			System.out.println("Server: IP = " + getServerIP());
+		} catch (ServerException e1) {
+			e1.printErrorMsg();
+		}
 		clientList = new CopyOnWriteArrayList<>();
 		System.out.println("Server: wait client connections....");
 		try {
 			collectClient();
-		} catch (ServerException e) {
-			e.printErrorMsg();
+		} catch (ServerException e2) {
+			e2.printErrorMsg();
 		}
 		System.out.println("Server: room full....");
 	}
 	
-	@SuppressWarnings("resource")
 	private void collectClient() throws ServerException {
 		
-		ServerSocket serverSocket = null;
-		try {
-			serverSocket = new ServerSocket(8080);
+		try (ServerSocket serverSocket = new ServerSocket(8080);){
+			while(Server.this.clientList.size() < 4) {
+				try (Socket socket = serverSocket.accept();){
+					Server.this.clientList.add(new ObjectOutputStream(socket.getOutputStream()));
+				} catch (IOException e) {
+					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
+				}
+				System.out.println("Server: room client = " + Server.this.clientList.size());
+			}
 		} catch (IOException e) {
 			throw new ServerException(ErrorCode.SERVERSOCKET_CREATE_ERROR);
 		}
-		while(Server.this.clientList.size() < 4) {
-			try (Socket socket = serverSocket.accept();){
-				Server.this.clientList.add(new ObjectOutputStream(socket.getOutputStream()));
-			} catch (IOException e) {
-				throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
-			}
-			System.out.println("Server: room client = " + Server.this.clientList.size());
-		}
 	}
 	
-	public String getServerIP() {
+	public String getServerIP() throws ServerException {
 		try {
 			return InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return "";
+			throw new ServerException(ErrorCode.GET_SERVER_IP_ERROR);
 		}
 	}
 }
