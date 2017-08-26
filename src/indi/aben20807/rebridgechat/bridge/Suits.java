@@ -4,18 +4,14 @@ public enum Suits {
 
 	SPADES(4), HEARTS(3), DIAMONDS(2), CLUBS(1);
 
-	private int suit;
+	private int suitValue;
 
-	private Suits(int suit) {
-		this.suit = suit;
+	private Suits(int suitValue) {
+		this.suitValue = suitValue;
 	}
 
-	public int getSuit() {
-		return suit;
-	}
-	
-	public String toString() {
-		return ""+suit;
+	public int getSuitValue() {
+		return suitValue;
 	}
 
 	public static boolean contains(Suits suit) {

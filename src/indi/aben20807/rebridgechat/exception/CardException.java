@@ -4,6 +4,7 @@ import indi.aben20807.rebridgechat.ErrorCode;
 
 public class CardException extends Exception {
 
+	private static final long serialVersionUID = -6093834835839240191L;
 	private int errorCode;
 	private String errorMsg;
 

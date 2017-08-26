@@ -2,7 +2,7 @@ package indi.aben20807.rebridgechat;
 
 public enum ErrorCode {
 
-	CARD_ARGUMENT_ERROR(0, "argument error occur when creating card");
+	CARD_ARGUMENT_ERROR(0, "Argument error occurred when creating a card");
 
 	private final int code;
 	private final String msg;
