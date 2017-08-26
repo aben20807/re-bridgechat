@@ -5,8 +5,8 @@ import indi.aben20807.rebridgechat.ErrorCode;
 public abstract class BridgechatException extends Exception{
 
 	private static final long serialVersionUID = -5069771817962750237L;
-	private int errorCode;
-	private String errorMsg;
+	protected int errorCode;
+	protected String errorMsg;
 
 	public BridgechatException(ErrorCode code) {
 		this.errorMsg = code.getMsg();

@@ -15,7 +15,7 @@ public class CardTest {
 			Card card2 = new Card('j', Suits.CLUBS, 10);
 			System.out.println(card2.getCardInfo());
 		} catch (CardException e) {
-			System.out.println(e.getErrorMsg());
+			e.printErrorMsg();
 		}
 	}
 }

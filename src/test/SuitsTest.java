@@ -9,5 +9,4 @@ public class SuitsTest {
 		System.out.println(Suits.DIAMONDS);
 		System.out.println(Suits.SPADES.getSuitValue());
 	}
-
 }
