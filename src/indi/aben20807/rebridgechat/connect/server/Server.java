@@ -7,9 +7,11 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import indi.aben20807.rebridgechat.ErrorCode;
+import indi.aben20807.rebridgechat.connect.Message;
 import indi.aben20807.rebridgechat.exception.ServerException;
 
 public class Server {
@@ -83,14 +85,29 @@ public class Server {
 		}
 	
 		public void run() {
-			Object object;
+			String message;
 			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
-				while ((object = in.readObject()) != null) {
-					System.out.println(object);
+				while ((message = (String) in.readObject()) != null) {
+					System.out.println(message);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void broadcast(Message message, List<ObjectOutputStream> memberList) {
+			for (ObjectOutputStream i : memberList) {
+				straightTransmit(message, i);
+			}
+		}
+		
+		public void straightTransmit(Message message, ObjectOutputStream out){
+			try {
+				out.writeObject(message);
+				out.flush();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

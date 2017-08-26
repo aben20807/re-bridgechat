@@ -2,7 +2,11 @@ package indi.aben20807.rebridgechat.connect.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import indi.aben20807.rebridgechat.ErrorCode;
+import indi.aben20807.rebridgechat.exception.ClientException;
 
 public class Client {
 
@@ -10,7 +14,7 @@ public class Client {
 	
 	public Client() {
 		connectToServer("192.168.56.1");
-		new Channel();
+		new Receiver();
 	}
 	
 	public void connectToServer(String serverIP) {
@@ -21,9 +25,19 @@ public class Client {
 		}
 	}
 	
-	class Channel implements Runnable{
+	public void submit(String message) throws ClientException {
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			out.writeObject(message);
+			out.flush();
+		} catch (IOException e) {
+			throw new ClientException(ErrorCode.CLIENT_SUBMIT_ERROR);
+		}
+	}
+	
+	class Receiver implements Runnable{
 		
-		Channel(){
+		Receiver(){
 			new Thread(this).start();
 		}
 		
