@@ -39,14 +39,6 @@ public class Server {
 		System.out.println("Server: room full....");
 		linkBroadcasterToReceivers();
 		System.out.println("Server: channels have been created....");
-//		try {
-//			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
-//			out.writeObject(new Message("S"));
-//			out = new ObjectOutputStream(clientList.get(1).getOutputStream());
-//			out.writeObject(new Message("SS"));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 	}
 	
 	private void collectClient() throws ServerException {
@@ -76,7 +68,6 @@ public class Server {
 	
 	public void linkBroadcasterToReceivers() {
 		for(Socket socket : clientList) {
-			//new Broadcaster(socket);
 			try {
 				objectOutputStreamList.add(new ObjectOutputStream(socket.getOutputStream()));
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -87,26 +78,20 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
-		for(int i = 0; i < 4; i++) {
-			System.out.println("o: "+objectOutputStreamList.get(i));
-			System.out.println("i: "+objectInputStreamList.get(i));
-		}
 	}
 	
 	class Broadcaster implements Runnable{
 		
-		private Socket socket;
 		private ObjectInputStream in;
 		
 		Broadcaster(ObjectInputStream in){
-			//this.socket = socket;
 			this.in = in;
 			new Thread(this).start();
 		}
 	
 		public void run() {
 			Message message;
-			try /*(ObjectInputStream in = new ObjectInputStream(socket.getInputStream());)*/{
+			try {
 				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
 					broadcast(message, Server.this.objectOutputStreamList);

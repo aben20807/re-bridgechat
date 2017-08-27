@@ -33,7 +33,6 @@ public class Client {
 	
 	public void submit(Message message) throws ClientException {
 		try {
-			//ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			out.writeObject(message);
 			out.flush();
 		} catch (IOException e) {
@@ -50,7 +49,6 @@ public class Client {
 		public void run() {
 			Message message;
 			try {
-				//in = new ObjectInputStream(Client.this.socket.getInputStream());
 				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
 				}
