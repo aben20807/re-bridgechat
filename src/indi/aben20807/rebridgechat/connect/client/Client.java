@@ -12,6 +12,8 @@ import indi.aben20807.rebridgechat.exception.ClientException;
 public class Client {
 
 	private Socket socket;
+	private ObjectOutputStream out;
+	private ObjectInputStream in;
 	
 	public Client() {
 		connectToServer("192.168.56.1");
@@ -21,14 +23,17 @@ public class Client {
 	public void connectToServer(String serverIP) {
 		try {
 			socket = new Socket(serverIP, 8080);
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public void submit(Message message) throws ClientException {
 		try {
-			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			//ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			out.writeObject(message);
 			out.flush();
 		} catch (IOException e) {
@@ -44,7 +49,8 @@ public class Client {
 		
 		public void run() {
 			Message message;
-			try (ObjectInputStream in = new ObjectInputStream(Client.this.socket.getInputStream());){
+			try {
+				//in = new ObjectInputStream(Client.this.socket.getInputStream());
 				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
 				}

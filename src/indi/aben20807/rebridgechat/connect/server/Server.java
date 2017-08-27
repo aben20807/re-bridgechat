@@ -17,6 +17,7 @@ import indi.aben20807.rebridgechat.exception.ServerException;
 public class Server {
 
 	private CopyOnWriteArrayList<Socket> clientList;
+	private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
 	
 	public Server() {
 		System.out.println("Server: start....");
@@ -26,6 +27,7 @@ public class Server {
 			e1.printErrorMsg();
 		}
 		clientList = new CopyOnWriteArrayList<>();
+		objectOutputStreamList = new CopyOnWriteArrayList<>();
 		System.out.println("Server: wait client connections....");
 		try {
 			collectClient();
@@ -50,7 +52,8 @@ public class Server {
 			while(Server.this.clientList.size() < 4) {
 				try {
 					Socket socket = serverSocket.accept();
-					Server.this.clientList.add(socket);
+					clientList.add(socket);
+					objectOutputStreamList.add(new ObjectOutputStream(socket.getOutputStream()));
 				} catch (IOException e) {
 					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 				}
@@ -89,24 +92,20 @@ public class Server {
 			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
 				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
-//					broadcast(message, Server.this.clientList);
+					broadcast(message, Server.this.objectOutputStreamList);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}// catch (ServerException e) {
-//				e.printErrorMsg();
-//			}
+			} catch (ServerException e) {
+				e.printErrorMsg();
+			}
 		}
 		
-		public void broadcast(Message message, List<Socket> memberList) throws ServerException {
-			for (Socket i : memberList) {
-				try {
-					straightTransmit(message, new ObjectOutputStream(i.getOutputStream()));
-				} catch (IOException e) {
-					throw new ServerException(ErrorCode.SERVER_BROADCAST_ERROR);
-				}
+		public void broadcast(Message message, List<ObjectOutputStream> objectOutputStreamList) throws ServerException {
+			for (ObjectOutputStream i : objectOutputStreamList) {
+				straightTransmit(message, i);
 			}
 		}
 		
