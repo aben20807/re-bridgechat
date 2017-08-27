@@ -25,13 +25,36 @@ public class Client {
 			socket = new Socket(serverIP, 8080);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
+			waitRoomFull();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void submit(Message message) throws ClientException {
+	private void waitRoomFull() {
+		Message message;
+		try {
+			while ((message = (Message) in.readObject()) != null) {
+				if(message.getContent().equals("!succeed")) {	
+					Thread.sleep(200);
+					break;
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void submit(Message message) throws ClientException {
 		try {
 			out.writeObject(message);
 			out.flush();
@@ -47,16 +70,21 @@ public class Client {
 		}
 		
 		public void run() {
-			Message message;
+			Object object;
+			Object key = new Object();
+			synchronized (key) {
 			try {
-				while ((message = (Message) in.readObject()) != null) {
-					System.out.println(message);
+				while ((object = in.readObject()) != null) {
+					if(object instanceof Message) {
+						Message message = (Message) object;
+						System.out.println(message.getContent());
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
+			}}
 		}
 	}
 }

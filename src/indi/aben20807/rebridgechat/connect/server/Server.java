@@ -47,7 +47,6 @@ public class Server {
 				try {
 					Socket socket = serverSocket.accept();
 					clientList.add(socket);
-					
 				} catch (IOException e) {
 					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 				}
@@ -69,10 +68,21 @@ public class Server {
 	public void linkBroadcasterToReceivers() {
 		for(Socket socket : clientList) {
 			try {
-				objectOutputStreamList.add(new ObjectOutputStream(socket.getOutputStream()));
+				ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+				objectOutputStreamList.add(out);
+				
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				objectInputStreamList.add(in);
 				new Broadcaster(in);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for(ObjectOutputStream out : objectOutputStreamList) {
+			try {
+				out.writeObject(new Message("!succeed"));
+				out.flush();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -91,9 +101,12 @@ public class Server {
 	
 		public void run() {
 			Message message;
+			Object key = new Object();
+			synchronized (key) {
 			try {
 				while ((message = (Message) in.readObject()) != null) {
-					System.out.println(message);
+					
+					System.out.println(message.getContent());
 					broadcast(message, Server.this.objectOutputStreamList);
 				}
 			} catch (IOException e) {
@@ -102,7 +115,7 @@ public class Server {
 				e.printStackTrace();
 			} catch (ServerException e) {
 				e.printErrorMsg();
-			}
+			}}
 		}
 		
 		public void broadcast(Message message, List<ObjectOutputStream> objectOutputStreamList) throws ServerException {
@@ -111,9 +124,9 @@ public class Server {
 			}
 		}
 		
-		public void straightTransmit(Message message, ObjectOutputStream out){
+		public synchronized void straightTransmit(Message message, ObjectOutputStream out){
 			try {
-				out.writeObject(message);
+				out.writeObject((Message) message);
 				out.flush();
 			} catch (Exception e) {
 				e.printStackTrace();
