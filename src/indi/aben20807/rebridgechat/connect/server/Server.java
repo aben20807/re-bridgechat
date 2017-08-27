@@ -18,6 +18,7 @@ public class Server {
 
 	private CopyOnWriteArrayList<Socket> clientList;
 	private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
+	private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
 	
 	public Server() {
 		System.out.println("Server: start....");
@@ -28,6 +29,7 @@ public class Server {
 		}
 		clientList = new CopyOnWriteArrayList<>();
 		objectOutputStreamList = new CopyOnWriteArrayList<>();
+		objectInputStreamList = new CopyOnWriteArrayList<>();
 		System.out.println("Server: wait client connections....");
 		try {
 			collectClient();
@@ -37,14 +39,14 @@ public class Server {
 		System.out.println("Server: room full....");
 		linkBroadcasterToReceivers();
 		System.out.println("Server: channels have been created....");
-		try {
-			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
-			out.writeObject(new Message("S"));
-			out = new ObjectOutputStream(clientList.get(1).getOutputStream());
-			out.writeObject(new Message("SS"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			ObjectOutputStream out = new ObjectOutputStream(clientList.get(0).getOutputStream());
+//			out.writeObject(new Message("S"));
+//			out = new ObjectOutputStream(clientList.get(1).getOutputStream());
+//			out.writeObject(new Message("SS"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	private void collectClient() throws ServerException {
@@ -53,7 +55,7 @@ public class Server {
 				try {
 					Socket socket = serverSocket.accept();
 					clientList.add(socket);
-					objectOutputStreamList.add(new ObjectOutputStream(socket.getOutputStream()));
+					
 				} catch (IOException e) {
 					throw new ServerException(ErrorCode.SOCKET_ACCEPT_ERROR);
 				}
@@ -74,22 +76,37 @@ public class Server {
 	
 	public void linkBroadcasterToReceivers() {
 		for(Socket socket : clientList) {
-			new Broadcaster(socket);
+			//new Broadcaster(socket);
+			try {
+				objectOutputStreamList.add(new ObjectOutputStream(socket.getOutputStream()));
+				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+				objectInputStreamList.add(in);
+				new Broadcaster(in);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for(int i = 0; i < 4; i++) {
+			System.out.println("o: "+objectOutputStreamList.get(i));
+			System.out.println("i: "+objectInputStreamList.get(i));
 		}
 	}
 	
 	class Broadcaster implements Runnable{
 		
 		private Socket socket;
+		private ObjectInputStream in;
 		
-		Broadcaster(Socket socket){
-			this.socket = socket;
+		Broadcaster(ObjectInputStream in){
+			//this.socket = socket;
+			this.in = in;
 			new Thread(this).start();
 		}
 	
 		public void run() {
 			Message message;
-			try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());){
+			try /*(ObjectInputStream in = new ObjectInputStream(socket.getInputStream());)*/{
 				while ((message = (Message) in.readObject()) != null) {
 					System.out.println(message);
 					broadcast(message, Server.this.objectOutputStreamList);
