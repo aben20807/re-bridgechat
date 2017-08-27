@@ -36,8 +36,7 @@ public class Client {
 		Message message;
 		try {
 			while ((message = (Message) in.readObject()) != null) {
-				if(message.getContent().equals("!succeed")) {	
-					Thread.sleep(200);
+				if(message.getContent().equals(">succeed")) {
 					break;
 				}
 			}
@@ -45,10 +44,6 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -71,8 +66,6 @@ public class Client {
 		
 		public void run() {
 			Object object;
-			Object key = new Object();
-			synchronized (key) {
 			try {
 				while ((object = in.readObject()) != null) {
 					if(object instanceof Message) {
@@ -84,7 +77,7 @@ public class Client {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}}
+			}
 		}
 	}
 }

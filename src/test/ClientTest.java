@@ -15,19 +15,13 @@ public class ClientTest {
 		Client client = new Client();
 		
 		try {
-			Thread.sleep(100);
-			//client.submit(new Message("hello"));
 			String s;
 			do{
 				s = scanner.nextLine();
 				client.submit(new Message(s));
 			}while(!s.equals("bye"));
-			
 		} catch (ClientException e) {
 			e.printErrorMsg();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

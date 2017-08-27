@@ -66,27 +66,21 @@ public class Server {
 	}
 	
 	public void linkBroadcasterToReceivers() {
-		for(Socket socket : clientList) {
-			try {
+		try {
+			for(Socket socket : clientList) {
 				ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 				objectOutputStreamList.add(out);
-				
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				objectInputStreamList.add(in);
 				new Broadcaster(in);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		for(ObjectOutputStream out : objectOutputStreamList) {
-			try {
-				out.writeObject(new Message("!succeed"));
+			} 
+			for(ObjectOutputStream out : objectOutputStreamList) {
+				out.writeObject(new Message(">succeed"));
 				out.flush();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -100,14 +94,14 @@ public class Server {
 		}
 	
 		public void run() {
-			Message message;
-			Object key = new Object();
-			synchronized (key) {
+			Object object;
 			try {
-				while ((message = (Message) in.readObject()) != null) {
-					
-					System.out.println(message.getContent());
-					broadcast(message, Server.this.objectOutputStreamList);
+				while ((object = in.readObject()) != null) {
+					if(object instanceof Message) {
+						Message message = (Message) object;
+						System.out.println(message.getContent());
+						broadcast(message, Server.this.objectOutputStreamList);
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -115,7 +109,7 @@ public class Server {
 				e.printStackTrace();
 			} catch (ServerException e) {
 				e.printErrorMsg();
-			}}
+			}
 		}
 		
 		public void broadcast(Message message, List<ObjectOutputStream> objectOutputStreamList) throws ServerException {

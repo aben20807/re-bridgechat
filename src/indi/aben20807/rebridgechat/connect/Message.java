@@ -11,10 +11,10 @@ public class Message implements Serializable{
 		setContent(content);
 	}
 	
-//	@Override
-//	public String toString() {
-//		return getContent();
-//	}
+	@Override
+	public String toString() {
+		return getContent();
+	}
 	
 	public String getContent() {
 		return content;
