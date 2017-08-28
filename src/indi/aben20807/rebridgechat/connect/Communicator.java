@@ -14,6 +14,7 @@ public abstract class Communicator {
 		try {
 			object = in.readObject();
 		} catch (ClassNotFoundException | IOException e) {
+			// e.printStackTrace();
 			throw new CommunicatorException(ErrorCode.READ_FROM_CHANNEL_ERROR);
 		}
 		if(object instanceof Message) {

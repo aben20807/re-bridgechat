@@ -66,6 +66,14 @@ public class Client {
 				}
 			} catch (CommunicatorException e) {
 				e.printErrorMsg();
+			} finally {
+				try {
+					out.close();
+					in.close();
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

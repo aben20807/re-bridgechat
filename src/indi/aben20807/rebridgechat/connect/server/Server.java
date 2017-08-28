@@ -107,20 +107,30 @@ public class Server {
 				e.printErrorMsg();
 			} catch (ServerException e) {
 				e.printErrorMsg();
+			} finally {
+				try {
+					for(ObjectOutputStream out : objectOutputStreamList) {
+						out.close();
+					}
+					for(ObjectInputStream in : objectInputStreamList) {
+						in.close();
+					}
+					for(Socket socket : clientList) {
+						socket.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
 		public void broadcast(Message message, List<ObjectOutputStream> objectOutputStreamList) throws ServerException {
-			for (ObjectOutputStream i : objectOutputStreamList) {
-				straightTransmit(i, message);
-			}
-		}
-		
-		public synchronized void straightTransmit(ObjectOutputStream out, Message message){
-			try {
-				Communicator.writeToChannel(out, message);
-			} catch (CommunicatorException e) {
-				e.printErrorMsg();
+			for (ObjectOutputStream out : objectOutputStreamList) {
+				try {
+					Communicator.writeToChannel(out, message);
+				} catch (CommunicatorException e) {
+					e.printErrorMsg();
+				}
 			}
 		}
 	}
