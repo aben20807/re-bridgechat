@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.connect.Communicator;
@@ -21,6 +23,7 @@ public class Server {
 	private CopyOnWriteArrayList<Socket> clientList;
 	private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
 	private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
+	final  ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	public Server() {
 		System.out.println("Server: start....");
@@ -38,6 +41,34 @@ public class Server {
 			e2.printErrorMsg();
 		}
 		linkBroadcasterToReceivers();
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		closeAll();
+		super.finalize();
+	}
+	
+	private void closeAll() {
+		if (executorService != null) {
+			executorService.shutdown();
+		}
+		try {
+			for(ObjectOutputStream out : objectOutputStreamList) {
+				if (out != null)
+					out.close();
+			}
+			for(ObjectInputStream in : objectInputStreamList) {
+				if (in != null)
+				in.close();
+			}
+			for(Socket socket : clientList) {
+				if (socket != null)
+				socket.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void collectClient() throws ServerException {
@@ -73,7 +104,7 @@ public class Server {
 				objectOutputStreamList.add(out);
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				objectInputStreamList.add(in);
-				new Broadcaster(in);
+				executorService.execute(new Broadcaster(in));
 			}
 			System.out.println("Server: channels have been created");
 			for(ObjectOutputStream out : objectOutputStreamList) {
@@ -93,7 +124,7 @@ public class Server {
 		
 		Broadcaster(ObjectInputStream in){
 			this.in = in;
-			new Thread(this, "Broadcaster").start();
+			new Thread(this, "Broadcaster");
 		}
 	
 		public void run() {
@@ -108,19 +139,7 @@ public class Server {
 			} catch (ServerException e) {
 				e.printErrorMsg();
 			} finally {
-				try {
-					for(ObjectOutputStream out : objectOutputStreamList) {
-						out.close();
-					}
-					for(ObjectInputStream in : objectInputStreamList) {
-						in.close();
-					}
-					for(Socket socket : clientList) {
-						socket.close();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Server.this.closeAll();
 			}
 		}
 		
