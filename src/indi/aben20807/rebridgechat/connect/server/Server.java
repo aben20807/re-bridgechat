@@ -3,9 +3,11 @@ package indi.aben20807.rebridgechat.connect.server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -90,9 +92,10 @@ public class Server {
 	}
 	
 	public String getServerIP() throws ServerException {
-		try {
-			return InetAddress.getLocalHost().getHostAddress().toString();
-		} catch (UnknownHostException e) {
+		try(final DatagramSocket socket = new DatagramSocket()){
+			  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+			  return socket.getLocalAddress().getHostAddress().toString();
+		} catch (UnknownHostException | SocketException e) {
 			throw new ServerException(ErrorCode.GET_SERVER_IP_ERROR);
 		}
 	}
