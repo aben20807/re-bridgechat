@@ -5,9 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import indi.aben20807.rebridgechat.ErrorCode;
+import indi.aben20807.rebridgechat.connect.Communicator;
 import indi.aben20807.rebridgechat.connect.Message;
-import indi.aben20807.rebridgechat.exception.ClientException;
+import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
 public class Client {
 
@@ -27,37 +27,28 @@ public class Client {
 			in = new ObjectInputStream(socket.getInputStream());
 			waitRoomFull();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	private void waitRoomFull() {
-		Object object;
+		Message message;
 		try {
-			while ((object = in.readObject()) != null) {
-				if(object instanceof Message) {
-					Message message = (Message) object;
-					if(message.getContent().equals(">succeed")) {
-						break;
-					}
+			while((message = Communicator.readFromChannel(in)) != null) {
+				if(message.getContent().equals(">succeed")) {
+					break;
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (CommunicatorException e) {
+			e.printErrorMsg();
 		}
 	}
 	
-	public synchronized void submit(Message message) throws ClientException {
+	public synchronized void submit(Message message) {
 		try {
-			out.writeObject(message);
-			out.flush();
-		} catch (IOException e) {
-			throw new ClientException(ErrorCode.CLIENT_SUBMIT_ERROR);
+			Communicator.writeToChannel(out, message);
+		} catch (CommunicatorException e) {
+			e.printErrorMsg();
 		}
 	}
 	
@@ -68,18 +59,13 @@ public class Client {
 		}
 		
 		public void run() {
-			Object object;
+			Message message;
 			try {
-				while ((object = in.readObject()) != null) {
-					if(object instanceof Message) {
-						Message message = (Message) object;
-						System.out.println(message.getContent());
-					}
+				while((message = Communicator.readFromChannel(in)) != null) {
+					System.out.println(message.getContent());
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+			} catch (CommunicatorException e) {
+				e.printErrorMsg();
 			}
 		}
 	}

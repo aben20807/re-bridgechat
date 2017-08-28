@@ -13,15 +13,10 @@ public class ClientTest {
 	public static void main(String[] args) {
 
 		Client client = new Client();
-		
-		try {
-			String s;
-			do{
-				s = scanner.nextLine();
-				client.submit(new Message(s));
-			}while(!s.equals("bye"));
-		} catch (ClientException e) {
-			e.printErrorMsg();
-		}
+		String s;
+		do{
+			s = scanner.nextLine();
+			client.submit(new Message(s));
+		}while(!s.equals("bye"));
 	}
 }
