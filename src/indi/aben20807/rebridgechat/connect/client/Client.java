@@ -44,7 +44,7 @@ public class Client {
 		}
 	}
 	
-	public synchronized void submit(Message message) {
+	public synchronized void submitToServer(Message message) {
 		try {
 			Communicator.writeToChannel(out, message);
 		} catch (CommunicatorException e) {

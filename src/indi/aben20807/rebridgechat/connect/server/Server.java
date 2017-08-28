@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import indi.aben20807.rebridgechat.ErrorCode;
+import indi.aben20807.rebridgechat.connect.Communicator;
 import indi.aben20807.rebridgechat.connect.Message;
+import indi.aben20807.rebridgechat.exception.CommunicatorException;
 import indi.aben20807.rebridgechat.exception.ServerException;
 
 public class Server {
@@ -75,13 +77,13 @@ public class Server {
 			}
 			System.out.println("Server: channels have been created");
 			for(ObjectOutputStream out : objectOutputStreamList) {
-				out.writeObject(new Message(">succeed"));
-				out.flush();
+				Communicator.writeToChannel(out, new Message(">succeed"));
 			}
-			System.out.println("Server: emit to clients \">succeed\"");
+			System.out.println("Server: emit \">succeed\" to clients");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CommunicatorException e) {
+			e.printErrorMsg();
 		}
 	}
 	
@@ -95,19 +97,14 @@ public class Server {
 		}
 	
 		public void run() {
-			Object object;
+			Message message;
 			try {
-				while ((object = in.readObject()) != null) {
-					if(object instanceof Message) {
-						Message message = (Message) object;
-						System.out.println(message.getContent());
-						broadcast(message, Server.this.objectOutputStreamList);
-					}
+				while((message = Communicator.readFromChannel(in)) != null) {
+					System.out.println(message.getContent());
+					broadcast(message, Server.this.objectOutputStreamList);
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+			} catch (CommunicatorException e) {
+				e.printErrorMsg();
 			} catch (ServerException e) {
 				e.printErrorMsg();
 			}
@@ -115,16 +112,15 @@ public class Server {
 		
 		public void broadcast(Message message, List<ObjectOutputStream> objectOutputStreamList) throws ServerException {
 			for (ObjectOutputStream i : objectOutputStreamList) {
-				straightTransmit(message, i);
+				straightTransmit(i, message);
 			}
 		}
 		
-		public synchronized void straightTransmit(Message message, ObjectOutputStream out){
+		public synchronized void straightTransmit(ObjectOutputStream out, Message message){
 			try {
-				out.writeObject((Message) message);
-				out.flush();
-			} catch (Exception e) {
-				e.printStackTrace();
+				Communicator.writeToChannel(out, message);
+			} catch (CommunicatorException e) {
+				e.printErrorMsg();
 			}
 		}
 	}

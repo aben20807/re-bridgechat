@@ -22,6 +22,6 @@ public abstract class BridgechatException extends Exception{
 	}
 	
 	public void printErrorMsg() {
-		System.out.println(getErrorMsg());
+		System.err.println(getErrorMsg());
 	}
 }

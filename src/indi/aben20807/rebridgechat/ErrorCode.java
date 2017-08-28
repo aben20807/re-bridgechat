@@ -2,10 +2,10 @@ package indi.aben20807.rebridgechat;
 
 public enum ErrorCode {
 
-	CARD_ARGUMENT_ERROR(0, "Argument error occurred when creating a card."),
-	SERVERSOCKET_CREATE_ERROR(1, "Cannot new ServerSocket with port."),
-	SOCKET_ACCEPT_ERROR(2, "Socket accept error that cannot full room."),
-	GET_SERVER_IP_ERROR(3, "Cannot get server's IP address."),
+	CARD_ARGUMENT_ERROR(0, "Error when creating a card."),
+	SERVERSOCKET_CREATE_ERROR(1, "Error when newing ServerSocket with port."),
+	SOCKET_ACCEPT_ERROR(2, "Error when socket accept that cannot full room."),
+	GET_SERVER_IP_ERROR(3, "Error when getting server's IP address."),
 	CLIENT_SUBMIT_ERROR(4, "Error when subming message."),
 	SERVER_BROADCAST_ERROR(5, "Error when broadcasting to member."),
 	WRITE_TO_CHANNEL_ERROR(6, "Error when using Communicator to write message to channel."),

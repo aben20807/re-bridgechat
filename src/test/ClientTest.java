@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 import indi.aben20807.rebridgechat.connect.Message;
 import indi.aben20807.rebridgechat.connect.client.Client;
-import indi.aben20807.rebridgechat.exception.ClientException;
 
 public class ClientTest {
 
@@ -16,7 +15,7 @@ public class ClientTest {
 		String s;
 		do{
 			s = scanner.nextLine();
-			client.submit(new Message(s));
+			client.submitToServer(new Message(s));
 		}while(!s.equals("bye"));
 	}
 }
