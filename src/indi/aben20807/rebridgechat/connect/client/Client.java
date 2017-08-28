@@ -5,8 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.connect.Communicator;
 import indi.aben20807.rebridgechat.connect.Message;
+import indi.aben20807.rebridgechat.exception.ClientException;
 import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
 public class Client {
@@ -16,18 +18,22 @@ public class Client {
 	private ObjectInputStream in;
 	
 	public Client() {
-		connectToServer("192.168.56.1");
+		try {
+			connectToServer("192.168.56.1");
+		} catch (ClientException e) {
+			e.printErrorMsg();
+		}
 		new Receiver();
 	}
 	
-	public void connectToServer(String serverIP) {
+	public void connectToServer(String serverIP) throws ClientException {
 		try {
 			socket = new Socket(serverIP, 8080);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 			waitRoomFull();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new ClientException(ErrorCode.CONNECT_TO_SERVER_ERROR);
 		}
 	}
 	

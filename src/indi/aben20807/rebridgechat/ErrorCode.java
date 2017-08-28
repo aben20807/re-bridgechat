@@ -9,7 +9,8 @@ public enum ErrorCode {
 	CLIENT_SUBMIT_ERROR(4, "Error when subming message."),
 	SERVER_BROADCAST_ERROR(5, "Error when broadcasting to member."),
 	WRITE_TO_CHANNEL_ERROR(6, "Error when using Communicator to write message to channel."),
-	READ_FROM_CHANNEL_ERROR(7, "Error when using Communicator to read message from channel.");
+	READ_FROM_CHANNEL_ERROR(7, "Error when using Communicator to read message from channel."),
+	CONNECT_TO_SERVER_ERROR(8, "Error when connecting, room may be full.");
 	
 	private final int code;
 	private final String msg;
