@@ -23,7 +23,7 @@ public class Server {
 	private CopyOnWriteArrayList<Socket> clientList;
 	private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
 	private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
-	final  ExecutorService executorService = Executors.newCachedThreadPool();
+	final ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	public Server() {
 		System.out.println("Server: start....");
@@ -60,11 +60,11 @@ public class Server {
 			}
 			for(ObjectInputStream in : objectInputStreamList) {
 				if (in != null)
-				in.close();
+					in.close();
 			}
 			for(Socket socket : clientList) {
 				if (socket != null)
-				socket.close();
+					socket.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -22,6 +22,7 @@ public class Client {
 			connectToServer("192.168.56.1");
 		} catch (ClientException e) {
 			e.printErrorMsg();
+			System.exit(0);
 		}
 		new Receiver();
 	}
@@ -58,6 +59,25 @@ public class Client {
 		}
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		closeAll();
+		super.finalize();
+	}
+	
+	private void closeAll() {
+		try {
+			if (out != null)
+				out.close();
+			if (in != null)
+				in.close();
+			if (socket != null)
+				socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	class Receiver implements Runnable{
 		
 		Receiver(){
@@ -67,19 +87,13 @@ public class Client {
 		public void run() {
 			Message message;
 			try {
-				while((message = Communicator.readFromChannel(in)) != null) {
+				while((message = Communicator.readFromChannel(Client.this.in)) != null) {
 					System.out.println(message.getContent());
 				}
 			} catch (CommunicatorException e) {
 				e.printErrorMsg();
 			} finally {
-				try {
-					out.close();
-					in.close();
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Client.this.closeAll();
 			}
 		}
 	}
