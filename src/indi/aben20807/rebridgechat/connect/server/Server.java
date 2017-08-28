@@ -30,18 +30,16 @@ public class Server {
 		clientList = new CopyOnWriteArrayList<>();
 		objectOutputStreamList = new CopyOnWriteArrayList<>();
 		objectInputStreamList = new CopyOnWriteArrayList<>();
-		System.out.println("Server: wait client connections....");
 		try {
 			collectClient();
 		} catch (ServerException e2) {
 			e2.printErrorMsg();
 		}
-		System.out.println("Server: room full....");
 		linkBroadcasterToReceivers();
-		System.out.println("Server: channels have been created....");
 	}
 	
 	private void collectClient() throws ServerException {
+		System.out.println("Server: wait client connections....");
 		try (ServerSocket serverSocket = new ServerSocket(8080);){
 			while(Server.this.clientList.size() < 4) {
 				try {
@@ -55,6 +53,7 @@ public class Server {
 		} catch (IOException e) {
 			throw new ServerException(ErrorCode.SERVERSOCKET_CREATE_ERROR);
 		}
+		System.out.println("Server: room full");
 	}
 	
 	public String getServerIP() throws ServerException {
@@ -73,11 +72,13 @@ public class Server {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				objectInputStreamList.add(in);
 				new Broadcaster(in);
-			} 
+			}
+			System.out.println("Server: channels have been created");
 			for(ObjectOutputStream out : objectOutputStreamList) {
 				out.writeObject(new Message(">succeed"));
 				out.flush();
 			}
+			System.out.println("Server: emit to clients \">succeed\"");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,7 +91,7 @@ public class Server {
 		
 		Broadcaster(ObjectInputStream in){
 			this.in = in;
-			new Thread(this).start();
+			new Thread(this, "Broadcaster").start();
 		}
 	
 		public void run() {

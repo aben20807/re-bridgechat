@@ -33,11 +33,14 @@ public class Client {
 	}
 	
 	private void waitRoomFull() {
-		Message message;
+		Object object;
 		try {
-			while ((message = (Message) in.readObject()) != null) {
-				if(message.getContent().equals(">succeed")) {
-					break;
+			while ((object = in.readObject()) != null) {
+				if(object instanceof Message) {
+					Message message = (Message) object;
+					if(message.getContent().equals(">succeed")) {
+						break;
+					}
 				}
 			}
 		} catch (ClassNotFoundException e) {
@@ -61,7 +64,7 @@ public class Client {
 	class Receiver implements Runnable{
 		
 		Receiver(){
-			new Thread(this).start();
+			new Thread(this, "Receiver").start();
 		}
 		
 		public void run() {
