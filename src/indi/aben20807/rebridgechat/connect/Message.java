@@ -7,7 +7,7 @@ import indi.aben20807.rebridgechat.bridge.Card;
 public class Message implements Serializable{
 
 	private static final long serialVersionUID = 1371494515691412295L;
-	private String content;
+	private String text;
 	private Card card;
 	private MessageOption option;
 	
@@ -17,7 +17,7 @@ public class Message implements Serializable{
 			case CHAT:
 			case CALL:
 			case COMMAND:
-				setContent((String) object);
+				setText((String) object);
 				break;
 			case CARD:
 				setCard((Card) object);
@@ -27,36 +27,59 @@ public class Message implements Serializable{
 		}
 	}
 	
-	public Message(String content) {
-		setContent(content);
+	public Message(String text) {
+		setOption(MessageOption.COMMAND);
+		setText(text);
+	}
+	
+	public Object getContent() {
+		switch (option) {
+			case CHAT:
+			case CALL:
+			case COMMAND:
+				return getText();
+			case CARD:
+				return getCard();
+			default:
+				return null;
+		}
 	}
 	
 	@Override
 	public String toString() {
-		return getContent();
+		switch (option) {
+			case CHAT:
+			case CALL:
+			case COMMAND:
+				return getText();
+			case CARD:
+				return getCard().getCardInfo();
+			default:
+				return "Message out of options";
+		}
 	}
 	
-	public String getContent() {
-		return content;
+	private String getText() {
+		return text;
 	}
 	
-	public void setContent(String content) {
-		this.content = content;
+	private void setText(String text) {
+		this.text = text;
 	}
 
 	public MessageOption getOption() {
 		return option;
 	}
 
-	public void setOption(MessageOption option) {
+	private void setOption(MessageOption option) {
 		this.option = option;
 	}
 
-	public Card getCard() {
+	private Card getCard() {
 		return card;
 	}
 
-	public void setCard(Card card) {
+	private void setCard(Card card) {
 		this.card = card;
 	}
 }

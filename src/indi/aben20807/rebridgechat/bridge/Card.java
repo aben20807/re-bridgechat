@@ -14,6 +14,11 @@ public class Card {
 		setSuit(suit);
 		setValue(value);
 	}
+	
+	@Override
+	public String toString() {
+		return getCardInfo();
+	}
 
 	public String getCardInfo() {
 		return ("" + getPoint() + getSuitValue() + getValue());
