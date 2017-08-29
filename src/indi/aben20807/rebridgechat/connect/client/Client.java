@@ -16,6 +16,7 @@ public class Client {
 	private Socket socket;
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
+	private Message message;
 	
 	public Client() {
 		try {
@@ -25,6 +26,10 @@ public class Client {
 			System.exit(0);
 		}
 		new Receiver();
+	}
+	
+	public Message getMessage() {
+		return message;
 	}
 	
 	public void connectToServer(String serverIP) throws ClientException {
@@ -85,10 +90,9 @@ public class Client {
 		}
 		
 		public void run() {
-			Message message;
 			try {
-				while((message = Communicator.readFromChannel(Client.this.in)) != null) {
-					System.out.println(message.getContent());
+				while((Client.this.message = Communicator.readFromChannel(Client.this.in)) != null) {
+					System.out.println(Client.this.message.getContent());
 				}
 			} catch (CommunicatorException e) {
 				e.printErrorMsg();
