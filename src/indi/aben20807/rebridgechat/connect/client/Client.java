@@ -17,8 +17,10 @@ public class Client {
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
 	private Message message;
+	private boolean isReadyToSubmit;
 	
 	public Client() {
+		isReadyToSubmit = false;
 		try {
 			connectToServer("192.168.56.1");
 		} catch (ClientException e) {
@@ -26,6 +28,7 @@ public class Client {
 			System.exit(0);
 		}
 		new Receiver();
+		isReadyToSubmit = true;
 	}
 	
 	public Message getMessage() {
@@ -57,11 +60,19 @@ public class Client {
 	}
 	
 	public synchronized void submitToServer(Message message) {
-		try {
-			Communicator.writeToChannel(out, message);
-		} catch (CommunicatorException e) {
-			e.printErrorMsg();
-		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (isReadyToSubmit == false) {
+					System.out.flush();// mysterious power OuO
+				}
+				try {
+					Communicator.writeToChannel(out, message);
+				} catch (CommunicatorException e) {
+					e.printErrorMsg();
+				}
+			}
+		}).start();
 	}
 	
 	@Override

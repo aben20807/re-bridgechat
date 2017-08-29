@@ -12,6 +12,7 @@ public class ClientTest {
 	public static void main(String[] args) {
 
 		Client client = new Client();
+		client.submitToServer(new Message("hello"));
 		String s;
 		do{
 			s = scanner.nextLine();
