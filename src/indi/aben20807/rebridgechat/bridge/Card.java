@@ -5,14 +5,18 @@ import indi.aben20807.rebridgechat.exception.CardException;
 
 public class Card {
 
-	private char point;// card point (2~9,T,J,Q,K,A)
+	private char point; // card point (2~9,T,J,Q,K,A)
 	private Suits suit; // card suit (defined in Suits)
-	private int value; // 2~14
+	private int value;  // 2~14
 
-	public Card(char point, Suits suit, int value) throws CardException {
-		setPoint(point);
-		setSuit(suit);
-		setValue(value);
+	public Card(char point, Suits suit, int value) {
+		try {
+			setPoint(point);
+			setSuit(suit);
+			setValue(value);
+		} catch (CardException e) {
+			e.printErrorMsg();
+		}
 	}
 	
 	@Override

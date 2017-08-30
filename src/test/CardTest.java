@@ -11,11 +11,7 @@ public class CardTest {
 		Card card1 = new Card('T', Suits.CLUBS, 2);
 		System.out.println(card1.getCardInfo());
 
-		try {
-			Card card2 = new Card('j', Suits.CLUBS, 10);
-			System.out.println(card2.getCardInfo());
-		} catch (CardException e) {
-			e.printErrorMsg();
-		}
+		Card card2 = new Card('j', Suits.CLUBS, 10);
+		System.out.println(card2.getCardInfo());
 	}
 }
