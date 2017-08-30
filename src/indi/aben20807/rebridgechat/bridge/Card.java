@@ -1,10 +1,13 @@
 package indi.aben20807.rebridgechat.bridge;
 
+import java.io.Serializable;
+
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.exception.CardException;
 
-public class Card {
+public class Card implements Serializable{
 
+	private static final long serialVersionUID = -2488863465746111038L;
 	private char point; // card point (2~9,T,J,Q,K,A)
 	private Suits suit; // card suit (defined in Suits)
 	private int value;  // 2~14
