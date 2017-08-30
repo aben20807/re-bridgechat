@@ -12,7 +12,7 @@ public class ClientTest {
 	public static void main(String[] args) {
 
 		Client client = new Client();
-		client.submitToServer(new Message("hello"));
+		// client.submitToServer(new Message("hello"));// not submit message at beginning
 		String s;
 		do{
 			s = scanner.nextLine();

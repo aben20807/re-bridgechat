@@ -6,7 +6,7 @@ import indi.aben20807.rebridgechat.bridge.Card;
 
 public class Message implements Serializable{
 
-	private static final long serialVersionUID = 1371494515691412295L;
+	private static final long serialVersionUID = -8035326121458727830L;
 	private String text;
 	private Card card;
 	private MessageOption option;

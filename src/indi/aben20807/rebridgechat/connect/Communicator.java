@@ -33,6 +33,7 @@ public abstract class Communicator {
 				out.writeObject(message);
 				out.flush();
 			} catch (IOException e) {
+				// e.printStackTrace();
 				throw new CommunicatorException(ErrorCode.WRITE_TO_CHANNEL_ERROR);
 			}
 		}

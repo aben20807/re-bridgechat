@@ -51,6 +51,7 @@ public class Client {
 		try {
 			while((message = Communicator.readFromChannel(in)) != null) {
 				if(message.getContent().equals(">succeed")) {
+					System.out.println("get \">succeed\"");
 					break;
 				}
 			}
