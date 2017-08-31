@@ -60,7 +60,7 @@ public class Client {
 		}
 	}
 	
-	public synchronized void submitToServer(Message message) {
+	public void submitToServer(Message message) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
