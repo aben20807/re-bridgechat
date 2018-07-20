@@ -8,15 +8,13 @@ import indi.aben20807.rebridgechat.exception.CardException;
 public class Card implements Serializable {
 
   private static final long serialVersionUID = -2488863465746111038L;
-  private char point; // card point (2~9,T,J,Q,K,A)
-  private Suits suit; // card suit (defined in Suits)
-  private int value; // 2~14
+  private Suits suit;
+  private Ranks rank;
 
-  public Card(char point, Suits suit, int value) {
+  public Card(Suits suit, Ranks rank) {
     try {
-      setPoint(point);
       setSuit(suit);
-      setValue(value);
+      setRank(rank);
     } catch (CardException e) {
       e.printErrorMsg();
     }
@@ -24,32 +22,19 @@ public class Card implements Serializable {
 
   @Override
   public String toString() {
-    return getCardInfo();
+	  return ("" + suit + rank);
   }
 
   public String getCardInfo() {
-    return ("" + getPoint() + getSuitValue() + getValue());
-  }
-
-  public char getPoint() {
-    return point;
-  }
-
-  private void setPoint(char point) throws CardException {
-    if ((point >= '2' && point <= '9')
-        || point == 'T'
-        || point == 'J'
-        || point == 'Q'
-        || point == 'K'
-        || point == 'A') {
-      this.point = point;
-      return;
-    }
-    throw new CardException(ErrorCode.CARD_ARGUMENT_ERROR);
+    return ("" + getSuitValue() + getRankValue());
   }
 
   public int getSuitValue() {
     return suit.getSuitValue();
+  }
+
+  public int getRankValue() {
+    return rank.getRankValue();
   }
 
   private void setSuit(Suits suit) throws CardException {
@@ -60,13 +45,9 @@ public class Card implements Serializable {
     throw new CardException(ErrorCode.CARD_ARGUMENT_ERROR);
   }
 
-  public int getValue() {
-    return value;
-  }
-
-  private void setValue(int value) throws CardException {
-    if (value >= 2 && value <= 14) {
-      this.value = value;
+  public void setRank(Ranks rank) throws CardException {
+    if (Ranks.contains(rank)) {
+      this.rank = rank;
       return;
     }
     throw new CardException(ErrorCode.CARD_ARGUMENT_ERROR);

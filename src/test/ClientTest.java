@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import indi.aben20807.rebridgechat.bridge.Card;
+import indi.aben20807.rebridgechat.bridge.Ranks;
 import indi.aben20807.rebridgechat.bridge.Suits;
 import indi.aben20807.rebridgechat.connect.Message;
 import indi.aben20807.rebridgechat.connect.MessageOption;
@@ -29,7 +30,7 @@ public class ClientTest {
           client.submitToServer(new Message(scanner.nextLine()));
           break;
         case "card":
-          client.submitToServer(new Message(new Card('T', Suits.CLUBS, 10), MessageOption.CARD));
+          client.submitToServer(new Message(new Card(Suits.CLUBS, Ranks._T), MessageOption.CARD));
           break;
         default:
           break;
