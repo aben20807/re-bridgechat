@@ -22,7 +22,7 @@ public class Client {
 	public Client() {
 		isReadyToSubmit = false;
 		try {
-			connectToServer("192.168.56.1");
+			connectToServer("127.0.0.1");
 		} catch (ClientException e) {
 			e.printErrorMsg();
 			System.exit(0);
