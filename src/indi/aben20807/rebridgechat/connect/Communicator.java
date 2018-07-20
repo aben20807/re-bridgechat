@@ -7,7 +7,9 @@ import java.io.ObjectOutputStream;
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
-public abstract class Communicator {
+public final class Communicator {
+
+  private Communicator() {}
 
   public static Message readFromChannel(ObjectInputStream in) throws CommunicatorException {
     Object object = null;
