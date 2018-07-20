@@ -11,10 +11,12 @@ public class CardTest {
 
     Card card1 = new Card(Suits.CLUBS, Ranks._2);
     System.out.println(card1);
-    System.out.println(card1.getCardInfo());
+    System.out.println(card1.getSuit());
+    System.out.println(card1.getRank());
 
     Card card2 = new Card(Suits.SPADES, Ranks._A);
     System.out.println(card2);
-    System.out.println(card2.getCardInfo());
+    System.out.println(card2.getSuit());
+    System.out.println(card2.getRank());
   }
 }

@@ -22,19 +22,15 @@ public class Card implements Serializable {
 
   @Override
   public String toString() {
-	  return ("" + suit + rank);
+	  return ("" + this.suit + this.rank);
   }
 
-  public String getCardInfo() {
-    return ("" + getSuitValue() + getRankValue());
+  public Suits getSuit() {
+    return this.suit;
   }
 
-  public int getSuitValue() {
-    return suit.getSuitValue();
-  }
-
-  public int getRankValue() {
-    return rank.getRankValue();
+  public Ranks getRank() {
+    return this.rank;
   }
 
   private void setSuit(Suits suit) throws CardException {

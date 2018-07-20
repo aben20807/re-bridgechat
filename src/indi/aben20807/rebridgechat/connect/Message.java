@@ -65,7 +65,7 @@ public class Message implements Serializable {
       case COMMAND:
         return getText();
       case CARD:
-        return getCard().getCardInfo();
+        return getCard().toString();
       default:
         return "Message out of options";
     }

@@ -103,7 +103,7 @@ public class Client {
     public void run() {
       try {
         while ((Client.this.message = Communicator.readFromChannel(Client.this.in)) != null) {
-          System.out.println(Client.this.message.getContent());
+          System.out.println(Client.this.message);
         }
       } catch (CommunicatorException e) {
         e.printErrorMsg();
