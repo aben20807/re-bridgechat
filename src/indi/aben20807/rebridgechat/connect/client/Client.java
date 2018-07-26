@@ -21,7 +21,6 @@ public class Client {
   private Socket socket;
   private ObjectOutputStream out;
   private ObjectInputStream in;
-  private Message message;
   private boolean isReadyToSubmit;
   private Queue<Message> outq;
   private Queue<Message> inq;
@@ -97,7 +96,7 @@ public class Client {
               public void run() {
                 try {
                   while (!outq.isEmpty()) {
-                    message = outq.poll();
+                    Message message = outq.poll();
                     Communicator.writeToChannel(out, message);
                   }
                 } catch (CommunicatorException e) {
