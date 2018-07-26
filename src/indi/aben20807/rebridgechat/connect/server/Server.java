@@ -22,12 +22,13 @@ import indi.aben20807.rebridgechat.exception.ServerException;
 
 public class Server {
 
+  private static Server instance = null;
   private CopyOnWriteArrayList<Socket> clientList;
   private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
   private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
   final ExecutorService executorService = Executors.newCachedThreadPool();
 
-  public Server() {
+  private Server() {
     System.out.println("Server: start....");
     try {
       System.out.println("Server: IP = " + getServerIP());
@@ -43,6 +44,17 @@ public class Server {
       e2.printErrorMsg();
     }
     linkBroadcasterToReceivers();
+  }
+
+  public static Server getInstance() {
+    if (instance == null) {
+      synchronized (Server.class) {
+        if (instance == null) {
+          instance = new Server();
+        }
+      }
+    }
+    return instance;
   }
 
   @Override
