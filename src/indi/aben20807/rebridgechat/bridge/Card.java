@@ -7,7 +7,7 @@ import indi.aben20807.rebridgechat.exception.CardException;
 
 public class Card implements Serializable {
 
-  private static final long serialVersionUID = -2488863465746111038L;
+  private static final long serialVersionUID = -9012319031878375767L;
   private Suits suit;
   private Ranks rank;
 
