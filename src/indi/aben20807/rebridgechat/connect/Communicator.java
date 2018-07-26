@@ -1,5 +1,6 @@
 package indi.aben20807.rebridgechat.connect;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,13 +8,16 @@ import java.io.ObjectOutputStream;
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
-public abstract class Communicator {
+public final class Communicator {
+
+  private Communicator() {}
 
   public static Message readFromChannel(ObjectInputStream in) throws CommunicatorException {
     Object object = null;
     if (in != null) {
       try {
         object = in.readObject();
+      } catch (EOFException e) {
       } catch (ClassNotFoundException | IOException e) {
         // e.printStackTrace();
         throw new CommunicatorException(ErrorCode.READ_FROM_CHANNEL_ERROR);

@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.connect.Communicator;
@@ -13,14 +17,19 @@ import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
 public class Client {
 
+  private static Client instance = null;
   private Socket socket;
   private ObjectOutputStream out;
   private ObjectInputStream in;
-  private Message message;
   private boolean isReadyToSubmit;
+  private Queue<Message> outq;
+  private Queue<Message> inq;
+  private static final ExecutorService pool = Executors.newCachedThreadPool();
 
-  public Client() {
+  private Client() {
     isReadyToSubmit = false;
+    outq = new ConcurrentLinkedQueue<>();
+    inq = new ConcurrentLinkedQueue<>();
     try {
       connectToServer("127.0.0.1");
     } catch (ClientException e) {
@@ -31,8 +40,19 @@ public class Client {
     isReadyToSubmit = true;
   }
 
+  public static Client getInstance() {
+    if (instance == null) {
+      synchronized (Client.class) {
+        if (instance == null) {
+          instance = new Client();
+        }
+      }
+    }
+    return instance;
+  }
+
   public Message getMessage() {
-    return message;
+    return inq.poll();
   }
 
   public void connectToServer(String serverIP) throws ClientException {
@@ -49,8 +69,9 @@ public class Client {
   private void waitRoomFull() {
     Message message;
     try {
-      while ((message = Communicator.readFromChannel(in)) != null) {
-        if (message.getContent().equals(">succeed")) {
+      while (true) {
+        if (((message = Communicator.readFromChannel(in)) != null)
+            && (message.getContent().equals(">succeed"))) {
           System.out.println("get \">succeed\"");
           break;
         }
@@ -60,22 +81,29 @@ public class Client {
     }
   }
 
-  public void submitToServer(Message message) {
-    new Thread(
+  public void submitMessage(Message message) {
+    if (isReadyToSubmit == true) {
+      outq.add(message);
+      submitToServer();
+    }
+  }
+
+  private void submitToServer() {
+    pool.execute(
+        new Thread(
             new Runnable() {
               @Override
               public void run() {
-                while (isReadyToSubmit == false) {
-                  System.out.flush(); // mysterious power OuO
-                }
                 try {
-                  Communicator.writeToChannel(out, message);
+                  while (!outq.isEmpty()) {
+                    Message message = outq.poll();
+                    Communicator.writeToChannel(out, message);
+                  }
                 } catch (CommunicatorException e) {
                   e.printErrorMsg();
                 }
               }
-            })
-        .start();
+            }));
   }
 
   @Override
@@ -85,6 +113,9 @@ public class Client {
   }
 
   private void closeAll() {
+    if (pool != null) {
+      pool.shutdown();
+    }
     try {
       if (out != null) out.close();
       if (in != null) in.close();
@@ -97,13 +128,15 @@ public class Client {
   class Receiver implements Runnable {
 
     Receiver() {
-      new Thread(this, "Receiver").start();
+      pool.execute(new Thread(this, "Receiver"));
     }
 
     public void run() {
+      Message message;
       try {
-        while ((Client.this.message = Communicator.readFromChannel(Client.this.in)) != null) {
-          System.out.println(Client.this.message.getContent());
+        while ((message = Communicator.readFromChannel(Client.this.in)) != null) {
+          System.out.println(message);
+          inq.add(message);
         }
       } catch (CommunicatorException e) {
         e.printErrorMsg();

@@ -22,12 +22,13 @@ import indi.aben20807.rebridgechat.exception.ServerException;
 
 public class Server {
 
+  private static Server instance = null;
   private CopyOnWriteArrayList<Socket> clientList;
   private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
   private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
-  final ExecutorService executorService = Executors.newCachedThreadPool();
+  private static final ExecutorService pool = Executors.newCachedThreadPool();
 
-  public Server() {
+  private Server() {
     System.out.println("Server: start....");
     try {
       System.out.println("Server: IP = " + getServerIP());
@@ -45,6 +46,17 @@ public class Server {
     linkBroadcasterToReceivers();
   }
 
+  public static Server getInstance() {
+    if (instance == null) {
+      synchronized (Server.class) {
+        if (instance == null) {
+          instance = new Server();
+        }
+      }
+    }
+    return instance;
+  }
+
   @Override
   protected void finalize() throws Throwable {
     closeAll();
@@ -52,8 +64,8 @@ public class Server {
   }
 
   private void closeAll() {
-    if (executorService != null) {
-      executorService.shutdown();
+    if (pool != null) {
+      pool.shutdown();
     }
     try {
       for (ObjectOutputStream out : objectOutputStreamList) {
@@ -104,7 +116,7 @@ public class Server {
         objectOutputStreamList.add(out);
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         objectInputStreamList.add(in);
-        executorService.execute(new Broadcaster(in));
+        pool.execute(new Broadcaster(in));
       }
       System.out.println("Server: channels have been created");
       for (ObjectOutputStream out : objectOutputStreamList) {
