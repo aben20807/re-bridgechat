@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.connect.Communicator;
@@ -18,9 +20,13 @@ public class Client {
   private ObjectInputStream in;
   private Message message;
   private boolean isReadyToSubmit;
+  private Queue<Message> outq;
+  private Queue<Message> inq;
 
   public Client() {
     isReadyToSubmit = false;
+    outq = new ConcurrentLinkedQueue<>();
+    inq = new ConcurrentLinkedQueue<>();
     try {
       connectToServer("127.0.0.1");
     } catch (ClientException e) {
@@ -32,7 +38,7 @@ public class Client {
   }
 
   public Message getMessage() {
-    return message;
+    return inq.poll();
   }
 
   public void connectToServer(String serverIP) throws ClientException {
@@ -49,8 +55,9 @@ public class Client {
   private void waitRoomFull() {
     Message message;
     try {
-      while ((message = Communicator.readFromChannel(in)) != null) {
-        if (message.getContent().equals(">succeed")) {
+      while (true) {
+        if (((message = Communicator.readFromChannel(in)) != null)
+            && (message.getContent().equals(">succeed"))) {
           System.out.println("get \">succeed\"");
           break;
         }
@@ -60,16 +67,23 @@ public class Client {
     }
   }
 
-  public void submitToServer(Message message) {
+  public void submitMessage(Message message) {
+    if (isReadyToSubmit == true) {
+      outq.add(message);
+      submitToServer();
+    }
+  }
+
+  private void submitToServer() {
     new Thread(
             new Runnable() {
               @Override
               public void run() {
-                while (isReadyToSubmit == false) {
-                  System.out.flush(); // mysterious power OuO
-                }
                 try {
-                  Communicator.writeToChannel(out, message);
+                  while (!outq.isEmpty()) {
+                    message = outq.poll();
+                    Communicator.writeToChannel(out, message);
+                  }
                 } catch (CommunicatorException e) {
                   e.printErrorMsg();
                 }
@@ -101,9 +115,11 @@ public class Client {
     }
 
     public void run() {
+      Message message;
       try {
-        while ((Client.this.message = Communicator.readFromChannel(Client.this.in)) != null) {
-          System.out.println(Client.this.message);
+        while ((message = Communicator.readFromChannel(Client.this.in)) != null) {
+          System.out.println(message);
+          inq.add(message);
         }
       } catch (CommunicatorException e) {
         e.printErrorMsg();

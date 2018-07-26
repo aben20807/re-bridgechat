@@ -27,10 +27,13 @@ public class ClientTest {
       s = scanner.nextLine();
       switch (s) {
         case "chat":
-          client.submitToServer(new Message(scanner.nextLine()));
+          client.submitMessage(new Message(scanner.nextLine()));
           break;
         case "card":
-          client.submitToServer(new Message(new Card(Suits.CLUBS, Ranks._T), MessageOption.CARD));
+          client.submitMessage(new Message(new Card(Suits.CLUBS, Ranks._T), MessageOption.CARD));
+          break;
+        case "get":
+          System.out.println(client.getMessage());
           break;
         default:
           break;
