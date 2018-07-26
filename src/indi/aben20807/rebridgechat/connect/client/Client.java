@@ -15,6 +15,7 @@ import indi.aben20807.rebridgechat.exception.CommunicatorException;
 
 public class Client {
 
+  private static Client instance = null;
   private Socket socket;
   private ObjectOutputStream out;
   private ObjectInputStream in;
@@ -23,7 +24,7 @@ public class Client {
   private Queue<Message> outq;
   private Queue<Message> inq;
 
-  public Client() {
+  private Client() {
     isReadyToSubmit = false;
     outq = new ConcurrentLinkedQueue<>();
     inq = new ConcurrentLinkedQueue<>();
@@ -35,6 +36,17 @@ public class Client {
     }
     new Receiver();
     isReadyToSubmit = true;
+  }
+
+  public static Client getInstance() {
+    if (instance == null) {
+      synchronized (Client.class) {
+        if (instance == null) {
+          instance = new Client();
+        }
+      }
+    }
+    return instance;
   }
 
   public Message getMessage() {

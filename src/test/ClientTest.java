@@ -21,7 +21,7 @@ public class ClientTest {
 
   public static void main(String[] args) {
 
-    Client client = new Client();
+    Client client = Client.getInstance();
     String s;
     do {
       s = scanner.nextLine();
