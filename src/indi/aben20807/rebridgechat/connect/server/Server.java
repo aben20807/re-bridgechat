@@ -26,7 +26,7 @@ public class Server {
   private CopyOnWriteArrayList<Socket> clientList;
   private CopyOnWriteArrayList<ObjectOutputStream> objectOutputStreamList;
   private CopyOnWriteArrayList<ObjectInputStream> objectInputStreamList;
-  final ExecutorService executorService = Executors.newCachedThreadPool();
+  private static final ExecutorService pool = Executors.newCachedThreadPool();
 
   private Server() {
     System.out.println("Server: start....");
@@ -64,8 +64,8 @@ public class Server {
   }
 
   private void closeAll() {
-    if (executorService != null) {
-      executorService.shutdown();
+    if (pool != null) {
+      pool.shutdown();
     }
     try {
       for (ObjectOutputStream out : objectOutputStreamList) {
@@ -116,7 +116,7 @@ public class Server {
         objectOutputStreamList.add(out);
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         objectInputStreamList.add(in);
-        executorService.execute(new Broadcaster(in));
+        pool.execute(new Broadcaster(in));
       }
       System.out.println("Server: channels have been created");
       for (ObjectOutputStream out : objectOutputStreamList) {

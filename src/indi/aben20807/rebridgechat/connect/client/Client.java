@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import indi.aben20807.rebridgechat.ErrorCode;
 import indi.aben20807.rebridgechat.connect.Communicator;
@@ -23,6 +25,7 @@ public class Client {
   private boolean isReadyToSubmit;
   private Queue<Message> outq;
   private Queue<Message> inq;
+  private static final ExecutorService pool = Executors.newCachedThreadPool();
 
   private Client() {
     isReadyToSubmit = false;
@@ -87,7 +90,8 @@ public class Client {
   }
 
   private void submitToServer() {
-    new Thread(
+    pool.execute(
+        new Thread(
             new Runnable() {
               @Override
               public void run() {
@@ -100,8 +104,7 @@ public class Client {
                   e.printErrorMsg();
                 }
               }
-            })
-        .start();
+            }));
   }
 
   @Override
@@ -111,6 +114,9 @@ public class Client {
   }
 
   private void closeAll() {
+    if (pool != null) {
+      pool.shutdown();
+    }
     try {
       if (out != null) out.close();
       if (in != null) in.close();
@@ -123,7 +129,7 @@ public class Client {
   class Receiver implements Runnable {
 
     Receiver() {
-      new Thread(this, "Receiver").start();
+      pool.execute(new Thread(this, "Receiver"));
     }
 
     public void run() {

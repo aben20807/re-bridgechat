@@ -1,11 +1,6 @@
 package test;
 
 import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import indi.aben20807.rebridgechat.bridge.Card;
 import indi.aben20807.rebridgechat.bridge.Ranks;
@@ -17,7 +12,6 @@ import indi.aben20807.rebridgechat.connect.client.Client;
 public class ClientTest {
 
   private static Scanner scanner = new Scanner(System.in);
-  static final ExecutorService executorService = Executors.newCachedThreadPool();
 
   public static void main(String[] args) {
 
